@@ -1,0 +1,4 @@
+scrapy
+celery
+requests
+pyjwt
