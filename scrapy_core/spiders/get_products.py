@@ -9,6 +9,11 @@ from scrapy.utils.project import get_project_settings
 
 class GetProducts(scrapy.Spider):
     name = "get_products"
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'scrapy_core.pipelines.product_persist_routing.ProductPersistRouting': 300,
+        }
+    }
 
     def __init__(self, user, password, callback_url=None, *args, **kwargs):
         super(GetProducts, self).__init__(*args, **kwargs)

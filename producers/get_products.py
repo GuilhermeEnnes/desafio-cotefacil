@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from tasks.worker import process_scraping_task
+from tasks.worker import process_products_scraping_task
 
 
 payload = {
@@ -10,7 +10,7 @@ payload = {
     "callback_url": "https://desafio.cotefacil.net"
 }
 
-result = process_scraping_task(payload)
+result = process_products_scraping_task(payload)
 print(f"[INFO] Tarefa {result.task} enviada para fila com sucesso.")
 
 
