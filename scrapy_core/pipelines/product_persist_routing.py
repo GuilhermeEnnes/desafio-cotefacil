@@ -6,8 +6,7 @@ import os
 import traceback
 from scrapy.exporters import JsonItemExporter
 
-class DataRoutingPipeline:
-    print("nadinha")
+class ProductPersistRouting:
     def open_spider(self, spider):
         self.items = []
         self.send_to_callback_url = bool(getattr(spider, 'callback_url', None))
