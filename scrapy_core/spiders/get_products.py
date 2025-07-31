@@ -9,29 +9,18 @@ from scrapy.utils.project import get_project_settings
 
 class GetProducts(scrapy.Spider):
     name = "get_products"
-    
-    custom_settings = {
-        'FEEDS': {
-            'output/servimed_products.json': {
-                'format': 'json',
-                'overwrite': True,
-                'encoding': 'utf8',
-            },
-        }
-    }
-    
-    
-    def __init__(self, user, password, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+    def __init__(self, user, password, callback_url=None, *args, **kwargs):
+        super(GetProducts, self).__init__(*args, **kwargs)
         self.user = user
         self.password = password
+        self.callback_url = callback_url
         self.api_login_request = "https://peapi.servimed.com.br/api/usuario/login"  # Ajuste se necessário
         self.api_get_product_request = "https://peapi.servimed.com.br/api/carrinho/oculto?siteVersion=4.0.27"  # Exemplo
         self.cookies = None
         self.headers = None
         self.payload= None
-    
-    
+        
     def start_requests(self):
         self.logger.info("Iniciando o processo de login...")
         formdata = {
@@ -46,7 +35,6 @@ class GetProducts(scrapy.Spider):
         )
         
     def after_login(self, response):
-        
         if response.status == 200:
             self.logger.info("Login realizado com sucesso!\n")
             self.logger.info("Iniciando a coleta de produtos...")
@@ -109,11 +97,11 @@ class GetProducts(scrapy.Spider):
         for target_product in products:
             try:
                 yield {
-                    "ean": target_product.get('codigoBarras', ''),
-                    "code": target_product.get('id', ''),
-                    "description": target_product.get('descricao', ''),
-                    "factory_price": target_product.get('valorBase', 0),
-                    "quantity_in_stock": target_product.get('quantidadeEstoque', 0),
+                    "gtin": str(target_product.get('codigoBarras', '')),
+                    "codigo": str(target_product.get('id', '')),
+                    "descricao": str(target_product.get('descricao', '')),
+                    "preco_fabrica": float(target_product.get('valorBase', 0)),
+                    "estoque": int(target_product.get('quantidadeEstoque', 0)),
                 }
             except Exception as e:
                 product_id = target_product.get('id', 'desconhecido')
@@ -156,9 +144,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the GetProducts spider with user credentials.")
     parser.add_argument("--user", required=True, help="User email for authentication")
     parser.add_argument("--password", required=True, help="Password for authentication")
+    parser.add_argument("--callback_url", required=False, help="Optional callback URL")
     args = parser.parse_args()
     
     settings = get_project_settings()
     process = CrawlerProcess(settings)
-    process.crawl(GetProducts,  user=args.user, password=args.password)
+    process.crawl(GetProducts,  user=args.user, password=args.password, callback_url=args.callback_url)
     process.start(install_signal_handlers=False)
