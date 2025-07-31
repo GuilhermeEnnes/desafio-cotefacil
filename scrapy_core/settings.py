@@ -7,4 +7,8 @@ LOG_LEVEL = "INFO" #"INFO","DEBUG","CRITICAL","ERROR","WARNING"
 RETRY_ENABLED = True
 RETRY_TIMES = 3
 DOWNLOAD_TIMEOUT = 30
+ITEM_PIPELINES = {
+    'scrapy_core.pipelines.data_routing_pipeline.DataRoutingPipeline': 300,
+}
+
 
